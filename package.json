@@ -1,0 +1,31 @@
+{
+  "name": "configurateurpc-api",
+  "version": "1.0.0",
+  "description": "1. **Initialize the Project:**    ```bash    mkdir configurateur-pc-api    cd configurateur-pc-api    npm init -y    ```",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "set NODE_ENV=test && jest",
+    "start": "nodemon src/server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.16.0",
+    "nodemon": "^3.1.10",
+    "pdfkit": "^0.17.1",
+    "swagger-ui-express": "^5.0.1"
+  },
+  "devDependencies": {
+    "jest": "^30.0.1",
+    "supertest": "^7.1.1"
+  }
+}

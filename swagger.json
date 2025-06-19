@@ -1,0 +1,399 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "ConfigurateurPC API",
+    "version": "1.0.0"
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "security": [
+    { "bearerAuth": [] }
+  ],
+  "paths": {
+    "/api/auth/register": {
+      "post": {
+        "summary": "Inscription utilisateur",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": { "type": "string" },
+                  "email": { "type": "string" },
+                  "password": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "User created" },
+          "400": { "description": "Invalid input" }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "summary": "Connexion utilisateur",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": { "type": "string" },
+                  "password": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Connexion réussie" },
+          "400": { "description": "Identifiants invalides" }
+        }
+      }
+    },
+    "/api/users": {
+      "get": {
+        "summary": "Liste tous les utilisateurs (admin)",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Liste des utilisateurs" },
+          "403": { "description": "Accès interdit" }
+        }
+      }
+    },
+    "/api/users/me": {
+      "get": {
+        "summary": "Profil de l'utilisateur courant",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Profil utilisateur" },
+          "404": { "description": "Non trouvé" }
+        }
+      },
+      "put": {
+        "summary": "Met à jour le profil utilisateur",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string" },
+                  "username": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Profil mis à jour" },
+          "404": { "description": "Non trouvé" }
+        }
+      },
+      "delete": {
+        "summary": "Supprime le compte utilisateur",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Compte supprimé" }
+        }
+      }
+    },
+    "/api/users/{id}": {
+      "get": {
+        "summary": "Récupère un utilisateur par ID (admin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Utilisateur trouvé" },
+          "404": { "description": "Non trouvé" },
+          "403": { "description": "Accès interdit" }
+        }
+      }
+    },
+    "/api/components": {
+      "get": {
+        "summary": "Liste tous les composants",
+        "responses": {
+          "200": { "description": "Liste des composants" }
+        }
+      },
+      "post": {
+        "summary": "Créer un composant",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "category": { "type": "string" },
+                  "brand": { "type": "string" },
+                  "title": { "type": "string" },
+                  "description": { "type": "string" },
+                  "model": { "type": "string" },
+                  "specs": { "type": "object" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Composant créé" },
+          "400": { "description": "Erreur de validation" }
+        }
+      }
+    },
+    "/api/components/search": {
+      "get": {
+        "summary": "Recherche de composants",
+        "parameters": [
+          { "name": "brand", "in": "query", "schema": { "type": "string" } },
+          { "name": "title", "in": "query", "schema": { "type": "string" } },
+          { "name": "minPrice", "in": "query", "schema": { "type": "number" } },
+          { "name": "maxPrice", "in": "query", "schema": { "type": "number" } }
+        ],
+        "responses": {
+          "200": { "description": "Résultats de la recherche" }
+        }
+      }
+    },
+    "/api/components/{id}": {
+      "get": {
+        "summary": "Récupère un composant par ID",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Composant trouvé" },
+          "404": { "description": "Non trouvé" }
+        }
+      },
+      "put": {
+        "summary": "Met à jour un composant",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "type": "object" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Composant mis à jour" },
+          "404": { "description": "Non trouvé" }
+        }
+      },
+      "delete": {
+        "summary": "Supprime un composant",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Composant supprimé" },
+          "404": { "description": "Non trouvé" }
+        }
+      }
+    },
+    "/api/components/{id}/prices": {
+      "post": {
+        "summary": "Ajoute ou met à jour le prix d'un composant pour un partenaire",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "partner": { "type": "string" },
+                  "price": { "type": "number" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Prix ajouté ou mis à jour" },
+          "404": { "description": "Composant non trouvé" }
+        }
+      }
+    },
+    "/api/components/{id}/prices/{partnerId}": {
+      "delete": {
+        "summary": "Supprime le prix d'un composant pour un partenaire",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "partnerId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Prix supprimé" },
+          "404": { "description": "Composant non trouvé" }
+        }
+      }
+    },
+    "/api/categories": {
+      "get": {
+        "summary": "Liste toutes les catégories",
+        "responses": {
+          "200": { "description": "Liste des catégories" }
+        }
+      },
+      "post": {
+        "summary": "Créer une catégorie",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "slug": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Catégorie créée" },
+          "400": { "description": "Erreur de validation" }
+        }
+      }
+    },
+    "/api/partners": {
+      "get": {
+        "summary": "Liste tous les partenaires",
+        "responses": {
+          "200": { "description": "Liste des partenaires" }
+        }
+      },
+      "post": {
+        "summary": "Créer un partenaire",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "url": { "type": "string" },
+                  "commission": { "type": "number" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Partenaire créé" },
+          "400": { "description": "Erreur de validation" }
+        }
+      }
+    },
+    "/api/configurations": {
+      "get": {
+        "summary": "Liste les configurations de l'utilisateur",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Liste des configurations" }
+        }
+      },
+      "post": {
+        "summary": "Créer une configuration",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "components": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "component": { "type": "string" },
+                        "partner": { "type": "string" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Configuration créée" }
+        }
+      }
+    },
+    "/api/configurations/{id}": {
+      "get": {
+        "summary": "Récupère une configuration par ID",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Configuration trouvée" },
+          "404": { "description": "Non trouvé" }
+        }
+      },
+      "delete": {
+        "summary": "Supprime une configuration",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Configuration supprimée" },
+          "404": { "description": "Non trouvé" }
+        }
+      }
+    },
+    "/api/configurations/{id}/total": {
+      "get": {
+        "summary": "Calcule le coût total d'une configuration",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Coût total" },
+          "404": { "description": "Non trouvé" }
+        }
+      }
+    }
+  }
+}
