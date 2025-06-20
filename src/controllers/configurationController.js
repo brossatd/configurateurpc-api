@@ -86,3 +86,16 @@ exports.exportConfigurationPDF = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+exports.getAllConfigurations = async (req, res) => {
+  try {
+    const configs = await Configuration.find()
+      .populate('user', 'username email')
+      .populate('components.component')
+      .populate('components.partner');
+    res.json(configs);
+  } catch (err) {
+    console.error('Erreur getAllConfigurations:', err); // Ajoute ce log
+    res.status(500).json({ message: err.message });
+  }
+};

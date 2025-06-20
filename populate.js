@@ -18,6 +18,22 @@ const connectDB = async () => {
   }
 };
 
+const generateComponents = (categoryId, brandPrefix, titles, specsList, partners) => {
+  return titles.map((title, i) => ({
+    category: categoryId,
+    brand: brandPrefix,
+    title,
+    description: `${title} - composant de haute performance`,
+    model: `${brandPrefix}-${i + 1}`,
+    specs: specsList[i],
+    image: '',
+    prices: [
+      { partner: partners[0]._id, price: 100 + i * 10 },
+      { partner: partners[1]._id, price: 110 + i * 10 }
+    ]
+  }));
+};
+
 const populate = async () => {
   await connectDB();
 
@@ -58,11 +74,17 @@ const populate = async () => {
   ]);
 
   // Catégories
-  const [cpuCategory, gpuCategory, ramCategory] = await Categories.insertMany([
+  const categoryData = [
     { name: 'Processeur', slug: 'cpu' },
     { name: 'Carte Graphique', slug: 'gpu' },
-    { name: 'Mémoire Vive', slug: 'ram' }
-  ]);
+    { name: 'Mémoire Vive', slug: 'ram' },
+    { name: 'Stockage SSD', slug: 'ssd' },
+    { name: 'Alimentation', slug: 'alm' },
+    { name: 'Boîtier', slug: 'boi' },
+    { name: 'Carte Mère', slug: 'ctm' },
+    { name: 'Utilitaires', slug: 'utl' }
+  ];
+  const categories = await Categories.insertMany(categoryData);
 
   // Partenaires
   const [amazon, ldlc, materiel] = await Partner.insertMany([
@@ -71,78 +93,41 @@ const populate = async () => {
     { name: 'Materiel.net', url: 'https://materiel.net', commission: 6, conditions: 'Livraison express' }
   ]);
 
-  // Composants
-  const components = await Component.insertMany([
-    {
-      category: cpuCategory._id,
-      brand: 'Intel',
-      title: 'Intel Core i7 12700K',
-      description: 'Processeur haut de gamme',
-      model: 'i7-12700K',
-      specs: { cores: 12, threads: 20, frequency: '3.6GHz' },
-      image: '',
-      prices: [
-        { partner: amazon._id, price: 320 },
-        { partner: ldlc._id, price: 330 }
-      ]
-    },
-    {
-      category: gpuCategory._id,
-      brand: 'NVIDIA',
-      title: 'RTX 4070',
-      description: 'GPU gamer haut de gamme',
-      model: 'RTX4070',
-      specs: { memory: '12GB', bus: '256-bit' },
-      image: '',
-      prices: [
-        { partner: amazon._id, price: 599 },
-        { partner: materiel._id, price: 615 }
-      ]
-    },
-    {
-      category: ramCategory._id,
-      brand: 'Corsair',
-      title: 'Corsair Vengeance 16GB DDR4',
-      description: 'RAM performante pour gaming et création',
-      model: 'CMK16GX4M2B3200C16',
-      specs: { capacity: '16GB', speed: '3200MHz' },
-      image: '',
-      prices: [
-        { partner: ldlc._id, price: 80 },
-        { partner: materiel._id, price: 85 }
-      ]
-    }
-  ]);
+  // Composants (5 par catégorie)
+  const allComponents = [];
+  const titles = ['A', 'B', 'C', 'D', 'E'];
+  categories.forEach((cat, index) => {
+    const specsList = Array.from({ length: 5 }, (_, i) => ({ prop: `${cat.slug}-spec-${i + 1}` }));
+    const comps = generateComponents(cat._id, cat.slug.toUpperCase(), titles.map(t => `${cat.name} ${t}`), specsList, [amazon, ldlc]);
+    allComponents.push(...comps);
+  });
 
-  // Configurations
+  const components = await Component.insertMany(allComponents);
+
+  // Configurations simples pour test
   await Configuration.insertMany([
     {
       user: users[0]._id,
-      name: 'PC Gamer Medium',
+      name: 'Setup 1',
       components: [
         { component: components[0]._id, partner: amazon._id },
-        { component: components[1]._id, partner: materiel._id }
+        { component: components[5]._id, partner: ldlc._id }
       ]
     },
     {
       user: users[1]._id,
-      name: 'PC Création',
+      name: 'Setup 2',
       components: [
-        { component: components[0]._id, partner: ldlc._id },
-        { component: components[2]._id, partner: materiel._id }
-      ]
-    },
-    {
-      user: users[2]._id,
-      name: 'PC Bureautique',
-      components: [
-        { component: components[2]._id, partner: ldlc._id }
+        { component: components[10]._id, partner: amazon._id },
+        { component: components[15]._id, partner: ldlc._id }
       ]
     }
   ]);
 
-  console.log('✅ Base de données peuplée avec succès avec plusieurs jeux de données.');
+  console.log('✅ Base de données peuplée avec succès avec 5 composants par catégorie.');
   process.exit();
 };
 
 populate();
+// Exécute le script
+// node populate.js
