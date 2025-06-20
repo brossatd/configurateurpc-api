@@ -42,27 +42,47 @@ exports.getTotalCost = async (req, res) => {
 };
 
 exports.exportConfigurationPDF = async (req, res) => {
-  const config = await Configuration.findById(req.params.id)
-    .populate('components.component')
-    .populate('components.partner')
-    .populate('user');
-  if (!config) return res.status(404).json({ message: 'Not found' });
+  try {
+    const config = await Configuration.findOne({
+      _id: req.params.id,
+      user: req.user.id
+    })
+      .populate('components.component')
+      .populate('components.partner');
 
-  const doc = new PDFDocument();
-  res.setHeader('Content-Type', 'application/pdf');
-  res.setHeader('Content-Disposition', `attachment; filename="configuration_${config._id}.pdf"`);
+    if (!config) return res.status(404).json({ message: 'Not found' });
 
-  doc.pipe(res);
-  doc.fontSize(18).text(`Configuration: ${config.name}`);
-  doc.fontSize(12).text(`Utilisateur: ${config.user.username}`);
-  doc.text(`Date: ${config.createdAt.toLocaleString()}`);
-  doc.moveDown();
+    const doc = new PDFDocument();
+    let total = 0;
 
-  config.components.forEach((item, idx) => {
-    doc.text(
-      `${idx + 1}. ${item.component.title} (${item.component.brand}) - Partenaire: ${item.partner?.name || 'N/A'}`
-    );
-  });
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="configuration_${config._id}.pdf"`);
 
-  doc.end();
+    doc.fontSize(18).text(`Configuration : ${config.name}`, { underline: true });
+    doc.moveDown();
+
+    doc.fontSize(14).text('Composants sélectionnés :');
+    doc.moveDown();
+
+    config.components.forEach(item => {
+      // Trouver le prix pour le partenaire sélectionné
+      const priceObj = item.component.prices.find(
+        p => p.partner.toString() === item.partner._id.toString()
+      );
+      const price = priceObj ? priceObj.price : 0;
+      total += price;
+
+      doc.fontSize(12).text(
+        `${item.component.title} (${item.component.brand}) - Partenaire : ${item.partner.name} - Prix : ${price} €`
+      );
+    });
+
+    doc.moveDown();
+    doc.fontSize(14).text(`Total : ${total} €`, { bold: true });
+
+    doc.end();
+    doc.pipe(res);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 };

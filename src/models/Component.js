@@ -1,5 +1,10 @@
 const mongoose = require('mongoose');
 
+const priceSchema = new mongoose.Schema({
+  partner: { type: mongoose.Schema.Types.ObjectId, ref: 'Partner', required: true },
+  price: { type: Number, required: true }
+});
+
 const componentSchema = new mongoose.Schema({
   category: { type: mongoose.Schema.Types.ObjectId, ref: 'Categories', required: true },
   brand: String,
@@ -8,10 +13,7 @@ const componentSchema = new mongoose.Schema({
   model: String,
   specs: Object,
   image: String,
-  prices: [{
-    partner: { type: mongoose.Schema.Types.ObjectId, ref: 'Partner' },
-    price: Number
-  }]
+  prices: [priceSchema]
 });
 
 module.exports = mongoose.model('Component', componentSchema);

@@ -6,7 +6,7 @@ const auth = require('../middleware/auth');
 const admin = require('../middleware/admin');
 
 router.get('/', componentController.getAllComponents);
-router.get('/:id', componentController.getComponentById);
+router.get('/:id', auth, componentController.getComponentById);
 router.post('/', auth, admin, componentController.createComponent);
 router.put('/:id', auth, admin, componentController.updateComponent);
 router.delete('/:id', auth, admin, componentController.deleteComponent);

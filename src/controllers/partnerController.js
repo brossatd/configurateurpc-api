@@ -26,14 +26,15 @@ exports.getPartnerById = async (req, res) => {
 
 exports.updatePartner = async (req, res) => {
   try {
-    const updatedPartner = await Partner.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
-    if (!updatedPartner) return res.status(404).json({ message: 'Partenaire non trouvé' });
-    res.json(updatedPartner);
+    const partner = await Partner.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true, runValidators: true }
+    );
+    if (!partner) return res.status(404).json({ message: 'Not found' });
+    res.json(partner);
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    res.status(500).json({ message: err.message });
   }
 };
 

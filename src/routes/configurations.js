@@ -1,4 +1,3 @@
-// filepath: [configurations.js](http://_vscodecontentref_/7)
 const express = require('express');
 const router = express.Router();
 const configurationController = require('../controllers/configurationController');

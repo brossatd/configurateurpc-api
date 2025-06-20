@@ -30,3 +30,14 @@ exports.deleteMe = async (req, res) => {
   await User.findByIdAndDelete(req.user.id);
   res.json({ message: 'Account deleted' });
 };
+
+exports.updateUser = async (req, res) => {
+  const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true }).select('-password');
+  if (!user) return res.status(404).json({ message: 'Not found' });
+  res.json(user);
+};
+
+exports.deleteUser = async (req, res) => {
+  await User.findByIdAndDelete(req.params.id);
+  res.json({ message: 'User deleted' });
+};
